@@ -29,6 +29,7 @@ Redukon is a **token-saving prompt rewriter** that uses local small AI models to
 - Saving money on API calls
 - Fitting more context into LLM windows
 - Making prompts more efficient
+- Building into your own apps via API
 
 ---
 
@@ -43,14 +44,11 @@ pip install -e https://github.com/CharlesArea/Redukon.git
 
 # One-time setup (installs Ollama + picks a model)
 redukon onboard
-
-# Rewrite prompts to save tokens!
-redukon rewrite -i "Your long prompt here..."
 ```
 
 ---
 
-## 📖 Usage
+## 📖 CLI Usage
 
 ### `redukon onboard`
 Interactive setup wizard:
@@ -64,7 +62,7 @@ Interactive setup wizard:
    | `phi3:3.8b` | 2.3GB | Better quality |
 
 ### `redukon rewrite`
-Rewrite your prompts!
+Rewrite your prompts from command line:
 
 ```bash
 # Basic
@@ -75,6 +73,78 @@ redukon rewrite -i @long-prompt.txt -o optimized.txt
 
 # Custom temperature (lower = more focused)
 redukon rewrite -i "prompt" --temp 0.3
+```
+
+### `redukon serve`
+Start the API server:
+
+```bash
+# Default port 8000
+redukon serve
+
+# Custom port
+redukon serve --port 9000
+redukon serve --host 127.0.0.1 --port 8080
+```
+
+---
+
+## 🌐 API Usage
+
+### Start Server
+```bash
+redukon serve
+```
+
+### Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/rewrite` | POST | Rewrite a prompt |
+| `/health` | GET | Health check |
+
+### Example Request
+
+```bash
+curl -X POST http://localhost:8000/rewrite \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Please write a comprehensive Python function that takes a list of integers...",
+    "model": "qwen2.5:0.5b",
+    "temperature": 0.3
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "optimized_prompt": "Write a Python function that filters even numbers from a list...",
+  "original_tokens": 87,
+  "optimized_tokens": 42,
+  "saved_tokens": 45,
+  "saved_percent": 52
+}
+```
+
+### API Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `prompt` | string | Yes | The prompt to optimize |
+| `model` | string | No | Model name (default: from config) |
+| `temperature` | float | No | Temperature 0.0-1.0 (default: 0.3) |
+
+---
+
+## 📝 Logging
+
+API requests are logged to `log/api-YYYY-MM-DD.log`:
+
+```
+[2026-03-10 12:00:00] [REQUEST] input_length=250, model=qwen2.5:0.5b
+[2026-03-10 12:00:05] [RESPONSE] output_length=120, original_tokens=62, optimized_tokens=30, saved_tokens=32, saved_percent=51%
+[2026-03-10 12:00:05] [ERROR] Generation failed: Ollama not running
 ```
 
 ---
@@ -102,7 +172,7 @@ redukon rewrite -i "prompt" --temp 0.3
 
 ## 🛠️ Requirements
 
-- Python 3.8+
+- Python 3.10+
 - [Ollama](https://ollama.com) (installed automatically during onboard)
 
 ---
