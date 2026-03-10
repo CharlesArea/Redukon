@@ -3,9 +3,13 @@
 ### Reduce Your Tokens. Keep Your Intent.
 
 <p align="center">
-  <img src="https://img.shields.io/pypi/v/redukon?color=%23ff6b6b&style=flat-square" alt="PyPI">
-  <img src="https://img.shields.io/pypi/l/redukon?color=%23ff6b6b&style=flat-square" alt="License">
-  <img src="https://img.shields.io/pypi/pyversions/redukon?color=%23ff6b6b&style=flat-square" alt="Python">
+  <a href="https://github.com/CharlesArea/Redukon/stargazers">
+    <img src="https://img.shields.io/github/stars/CharlesArea/Redukon?style=social" alt="Stars">
+  </a>
+  <a href="https://github.com/CharlesArea/Redukon/fork">
+    <img src="https://img.shields.io/github/forks/CharlesArea/Redukon?style=social" alt="Forks">
+  </a>
+  <img src="https://img.shields.io/github/license/CharlesArea/Redukon?color=%23ff6b6b" alt="License">
 </p>
 
 ---
@@ -27,7 +31,7 @@ Redukon is a **token-saving prompt rewriter** that uses local small AI models to
 
 ```bash
 # Install
-pip install -e .
+pip install -e https://github.com/CharlesArea/Redukon.git
 
 # One-time setup (installs Ollama + picks a model)
 redukon onboard
@@ -88,10 +92,10 @@ redukon rewrite -i "prompt" --temp 0.3
 
 ---
 
-##
+## 🛠️ Requirements
 
-- Python  🛠️ Requirements3.8+
-- [Ollama](https://ollama.com) (installed automatically)
+- Python 3.8+
+- [Ollama](https://ollama.com) (installed automatically during onboard)
 
 ---
 
