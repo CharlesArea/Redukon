@@ -176,6 +176,87 @@ def health():
     return jsonify({"status": "ok"})
 
 
+@app.route("/batch", methods=["POST"])
+def batch():
+    """Batch rewrite multiple prompts."""
+    try:
+        data = request.get_json()
+
+        if not data:
+            log_request("ERROR", "No JSON body provided")
+            return jsonify({"error": "No JSON body provided"}), 400
+
+        prompts = data.get("prompts")
+        if not prompts or not isinstance(prompts, list):
+            log_request("ERROR", "Missing or invalid 'prompts' field (must be a list)")
+            return jsonify({"error": "Missing or invalid 'prompts' field (must be a list)"}), 400
+
+        model = data.get("model")
+        temperature = data.get("temperature")
+
+        config = load_config()
+
+        if not model:
+            model = config.get("model", "qwen2.5:0.5b")
+        if temperature is None:
+            temperature = config.get("temperature", 0.3)
+
+        system_prompt = get_system_prompt(config) if config else DEFAULT_SYSTEM_PROMPT
+
+        log_request("BATCH", f"count={len(prompts)}, model={model}")
+
+        results = []
+        total_saved = 0
+        total_original = 0
+
+        for i, prompt in enumerate(prompts):
+            try:
+                optimized = generate(model, prompt, temperature=temperature, system_prompt=system_prompt)
+                
+                orig_tokens = count_tokens(prompt)
+                new_tokens = count_tokens(optimized) if optimized else 0
+                saved = orig_tokens - new_tokens
+                
+                results.append({
+                    "index": i,
+                    "original": prompt,
+                    "optimized_prompt": optimized,
+                    "original_tokens": orig_tokens,
+                    "optimized_tokens": new_tokens,
+                    "saved_tokens": saved,
+                    "saved_percent": int((saved / orig_tokens * 100) if orig_tokens > 0 else 0)
+                })
+                
+                total_saved += saved
+                total_original += orig_tokens
+                
+            except Exception as e:
+                results.append({
+                    "index": i,
+                    "original": prompt,
+                    "error": str(e)
+                })
+
+        overall_percent = int(total_saved / total_original * 100) if total_original > 0 else 0
+        
+        log_request("BATCH", f"completed={len(results)}, total_saved={total_saved}, overall_percent={overall_percent}%")
+
+        return jsonify({
+            "results": results,
+            "summary": {
+                "total": len(prompts),
+                "processed": len(results),
+                "total_original_tokens": total_original,
+                "total_saved_tokens": total_saved,
+                "overall_saved_percent": overall_percent
+            }
+        })
+
+    except Exception as e:
+        log_request("ERROR", f"Batch error: {str(e)}")
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
+
+
 def run_server(host="0.0.0.0", port=8000):
     """Run the Flask server."""
     log_request("INFO", f"Starting server on {host}:{port}")

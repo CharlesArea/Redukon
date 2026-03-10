@@ -32,6 +32,7 @@
   - [Streaming Example](#streaming-example)
   - [API Parameters](#api-parameters)
 - [🐳 Docker](#-docker)
+- [📦 Batch Mode](#-batch-mode)
 - [⚡ Example](#-example)
 - [🔧 Options](#-options)
 - [🛠️ Requirements](#️-requirements)
@@ -205,6 +206,59 @@ docker-compose up -d
 
 # Stop
 docker-compose down
+```
+
+---
+
+## 📦 Batch Mode
+
+Process multiple prompts at once!
+
+### CLI
+
+```bash
+# From file with multiple prompts (one per line)
+redukon batch -i prompts.txt
+
+# Multiple files
+redukon batch -i @file1.txt @file2.txt
+
+# With output
+redukon batch -i prompts.txt -o results/
+redukon batch -i prompts.txt -o results.json
+```
+
+### API
+
+```bash
+curl -X POST http://localhost:8000/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompts": [
+      "First prompt to optimize",
+      "Second prompt to optimize",
+      "Third prompt to optimize"
+    ],
+    "model": "qwen2.5:0.5b",
+    "temperature": 0.3
+  }'
+```
+
+**Response:**
+```json
+{
+  "results": [
+    {"index": 0, "original": "...", "optimized_prompt": "...", "saved_tokens": 10, "saved_percent": 25},
+    {"index": 1, "original": "...", "optimized_prompt": "...", "saved_tokens": 15, "saved_percent": 30}
+  ],
+  "summary": {
+    "total": 2,
+    "processed": 2,
+    "total_original_tokens": 100,
+    "total_saved_tokens": 25,
+    "overall_saved_percent": 25
+  }
+}
 ```
 
 ---
