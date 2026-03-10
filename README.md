@@ -3,13 +3,18 @@
 ### Reduce Your Tokens. Keep Your Intent.
 
 <p align="center">
+  <a href="https://pypi.org/project/redukon/">
+    <img src="https://img.shields.io/pypi/v/redukon?color=%23ff6b6b&style=flat-square" alt="PyPI">
+  </a>
+  <a href="https://pypi.org/project/redukon/">
+    <img src="https://img.shields.io/pypi/pyversions/redukon?color=%23ff6b6b&style=flat-square" alt="Python">
+  </a>
+  <a href="https://github.com/CharlesArea/Redukon/blob/main/LICENSE">
+    <img src="https://img.shields.io/pypi/l/redukon?color=%23ff6b6b&style=flat-square" alt="License">
+  </a>
   <a href="https://github.com/CharlesArea/Redukon/stargazers">
     <img src="https://img.shields.io/github/stars/CharlesArea/Redukon?style=social" alt="Stars">
   </a>
-  <a href="https://github.com/CharlesArea/Redukon/fork">
-    <img src="https://img.shields.io/github/forks/CharlesArea/Redukon?style=social" alt="Forks">
-  </a>
-  <img src="https://img.shields.io/github/license/CharlesArea/Redukon?color=%23ff6b6b" alt="License">
 </p>
 
 ---
@@ -30,7 +35,10 @@ Redukon is a **token-saving prompt rewriter** that uses local small AI models to
 ## 🚀 Quick Start
 
 ```bash
-# Install
+# Install from PyPI
+pip install redukon
+
+# Or install latest from GitHub
 pip install -e https://github.com/CharlesArea/Redukon.git
 
 # One-time setup (installs Ollama + picks a model)
@@ -109,6 +117,6 @@ MIT © 2026 CharlesArea
 
 **Made with ❤️ for the AI community**
 
-[GitHub](https://github.com/CharlesArea/Redukon) • [Report Bug](https://github.com/CharlesArea/Redukon/issues)
+[GitHub](https://github.com/CharlesArea/Redukon) • [PyPI](https://pypi.org/project/redukon/) • [Report Bug](https://github.com/CharlesArea/Redukon/issues)
 
 </div>
