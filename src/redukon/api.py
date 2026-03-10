@@ -2,8 +2,8 @@ import os
 import json
 from datetime import datetime
 from pathlib import Path
-from flask import Flask, request, jsonify
-from .ollama import generate
+from flask import Flask, request, jsonify, Response
+from .ollama import generate, generate_stream
 from .cli import load_config, get_system_prompt, DEFAULT_SYSTEM_PROMPT
 
 app = Flask(__name__)
@@ -33,7 +33,7 @@ def count_tokens(text):
 
 @app.route("/rewrite", methods=["POST"])
 def rewrite():
-    """Rewrite endpoint that accepts JSON and returns optimized prompt."""
+    """Rewrite endpoint - non-streaming."""
     try:
         data = request.get_json()
 
@@ -59,7 +59,7 @@ def rewrite():
         system_prompt = get_system_prompt(config) if config else DEFAULT_SYSTEM_PROMPT
 
         original_tokens = count_tokens(prompt)
-        log_request("REQUEST", f"input_length={len(prompt)}, model={model}")
+        log_request("REQUEST", f"input_length={len(prompt)}, model={model}, stream=false")
 
         try:
             optimized_prompt = generate(
@@ -91,6 +91,77 @@ def rewrite():
                 "optimized_tokens": optimized_tokens,
                 "saved_tokens": saved_tokens,
                 "saved_percent": saved_percent,
+            }
+        )
+
+    except Exception as e:
+        log_request("ERROR", f"Unexpected error: {str(e)}")
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
+
+
+@app.route("/rewrite/stream", methods=["POST"])
+def rewrite_stream():
+    """Rewrite endpoint with streaming."""
+    try:
+        data = request.get_json()
+
+        if not data:
+            log_request("ERROR", "No JSON body provided")
+            return jsonify({"error": "No JSON body provided"}), 400
+
+        prompt = data.get("prompt")
+        if not prompt:
+            log_request("ERROR", "Missing required field: prompt")
+            return jsonify({"error": "Missing required field: prompt"}), 400
+
+        model = data.get("model")
+        temperature = data.get("temperature")
+
+        config = load_config()
+
+        if not model:
+            model = config.get("model", "qwen2.5:0.5b")
+        if temperature is None:
+            temperature = config.get("temperature", 0.3)
+
+        system_prompt = get_system_prompt(config) if config else DEFAULT_SYSTEM_PROMPT
+
+        original_tokens = count_tokens(prompt)
+        log_request("REQUEST", f"input_length={len(prompt)}, model={model}, stream=true")
+
+        def generate_sse():
+            full_response = ""
+            try:
+                for chunk in generate_stream(model, prompt, temperature, system_prompt):
+                    if chunk:
+                        full_response += chunk
+                        # Send as SSE (Server-Sent Events)
+                        yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+                
+                # Send final stats
+                optimized_tokens = count_tokens(full_response)
+                saved_tokens = original_tokens - optimized_tokens
+                saved_percent = int(
+                    (saved_tokens / original_tokens * 100) if original_tokens > 0 else 0
+                )
+                
+                log_request(
+                    "RESPONSE",
+                    f"output_length={len(full_response)}, original_tokens={original_tokens}, optimized_tokens={optimized_tokens}, saved_tokens={saved_tokens}, saved_percent={saved_percent}%",
+                )
+                
+                yield f"data: {json.dumps({'done': True, 'original_tokens': original_tokens, 'optimized_tokens': optimized_tokens, 'saved_tokens': saved_tokens, 'saved_percent': saved_percent})}\n\n"
+                
+            except Exception as e:
+                log_request("ERROR", f"Stream generation failed: {str(e)}")
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+        return Response(
+            generate_sse(),
+            mimetype='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'X-Accel-Buffering': 'no-cache',
             }
         )
 
