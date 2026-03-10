@@ -5,6 +5,7 @@ import json
 import click
 from pathlib import Path
 from .ollama import check_installed, install, list as list_models, pull, generate
+from .api import run_server
 
 CONFIG_DIR = Path.home() / ".redukon"
 CONFIG_FILE = CONFIG_DIR / "config.json"
@@ -55,7 +56,7 @@ def cli():
 def onboard():
     """Onboard: check/install Ollama and select a model."""
     click.echo("🚀 Welcome to Redukon!")
-    
+
     # Check Ollama
     if not check_installed():
         click.echo("\n❌ Ollama is not installed.")
@@ -73,22 +74,24 @@ def onboard():
     click.echo("\n📋 Available models:")
     for i, m in enumerate(MODELS, 1):
         click.echo(f"  {i}. {m}")
-    
+
     # Select model
     choice = click.prompt("\nSelect a model (1-4)", type=int, default=1)
     if 1 <= choice <= len(MODELS):
         model = MODELS[choice - 1]
     else:
         model = MODELS[0]
-    
+
     # Select temperature
-    temp = click.prompt("\nEnter temperature (0.0-1.0, lower = more focused)", type=float, default=0.3)
-    
+    temp = click.prompt(
+        "\nEnter temperature (0.0-1.0, lower = more focused)", type=float, default=0.3
+    )
+
     # Save config
     config = {
         "model": model,
         "temperature": temp,
-        "system_prompt": DEFAULT_SYSTEM_PROMPT
+        "system_prompt": DEFAULT_SYSTEM_PROMPT,
     }
     save_config(config)
     click.echo(f"\n✅ Saved: model={model}, temp={temp}")
@@ -100,20 +103,20 @@ def onboard():
 def config_cmd():
     """View or edit configuration."""
     config = load_config()
-    
+
     if not config:
         click.echo("❌ No config found. Run 'redukon onboard' first.")
         return
-    
+
     click.echo("\n📋 Current Config:")
     click.echo(f"  Model:      {config.get('model', 'Not set')}")
     click.echo(f"  Temperature: {config.get('temperature', 0.3)}")
-    
+
     # Show system prompt preview
     sp = config.get("system_prompt", DEFAULT_SYSTEM_PROMPT)
     click.echo(f"\n📝 System Prompt (first 200 chars):")
     click.echo(f"  {sp[:200]}...")
-    
+
     # Edit options
     click.echo("\n🔧 Edit options:")
     click.echo("  1. Edit system prompt")
@@ -121,11 +124,13 @@ def config_cmd():
     click.echo("  3. Change model")
     click.echo("  4. Reset to defaults")
     click.echo("  0. Exit")
-    
+
     choice = click.prompt("\nSelect (0-4)", type=int, default=0)
-    
+
     if choice == 1:
-        click.echo("\n📝 Enter new system prompt (press Enter on empty line to finish):")
+        click.echo(
+            "\n📝 Enter new system prompt (press Enter on empty line to finish):"
+        )
         lines = []
         while True:
             line = click.prompt("", default="", show_default=False)
@@ -138,7 +143,11 @@ def config_cmd():
             save_config(config)
             click.echo("✅ System prompt updated!")
     elif choice == 2:
-        temp = click.prompt("Enter temperature (0.0-1.0)", type=float, default=config.get("temperature", 0.3))
+        temp = click.prompt(
+            "Enter temperature (0.0-1.0)",
+            type=float,
+            default=config.get("temperature", 0.3),
+        )
         config["temperature"] = temp
         save_config(config)
         click.echo(f"✅ Temperature set to {temp}")
@@ -158,7 +167,9 @@ def config_cmd():
 
 
 @cli.command()
-@click.option("-i", "--input", "input_", required=True, help="Prompt string or @file.txt")
+@click.option(
+    "-i", "--input", "input_", required=True, help="Prompt string or @file.txt"
+)
 @click.option("-o", "--output", help="Output file (optional)")
 @click.option("-m", "--model", help="Override model (e.g., qwen2.5:0.5b)")
 @click.option("-t", "--temp", "temperature", type=float, help="Override temperature")
@@ -166,11 +177,11 @@ def rewrite(input_, output, model, temperature):
     """Rewrite a prompt to save tokens."""
     # Load config
     config = load_config()
-    
+
     if not config:
         click.echo("❌ Not onboarded yet. Run 'redukon onboard' first.")
         return
-    
+
     # Resolve input
     prompt = input_
     if input_.startswith("@"):
@@ -180,32 +191,48 @@ def rewrite(input_, output, model, temperature):
         else:
             click.echo(f"❌ File not found: {file_path}")
             return
-    
+
     # Use model/temp from args or config
     model = model or config.get("model")
     temp = temperature if temperature is not None else config.get("temperature", 0.3)
     system_prompt = get_system_prompt(config)
-    
+
     click.echo(f"🔄 Rewriting with {model} (temp={temp})...")
-    
+
     # Generate
     result = generate(model, prompt, temperature=temp, system_prompt=system_prompt)
-    
+
     if result:
         if output:
             Path(output).write_text(result)
             click.echo(f"✅ Saved to {output}")
         else:
             click.echo("\n" + result)
-        
+
         # Stats
         orig_tokens = len(prompt) // 4
         new_tokens = len(result) // 4
         saved = orig_tokens - new_tokens
         if saved > 0 and orig_tokens > 0:
-            click.echo(f"📉 Saved ~{saved} tokens ({saved*100//orig_tokens}%)")
+            click.echo(f"📉 Saved ~{saved} tokens ({saved * 100 // orig_tokens}%)")
     else:
         click.echo("❌ Failed to generate response.")
+
+
+@cli.command()
+@click.option("--host", default="0.0.0.0", help="Host to bind to")
+@click.option("--port", default=8000, type=int, help="Port to bind to")
+def serve(host, port):
+    """Start the API server."""
+    click.echo(f"🚀 Starting Redukon API server on {host}:{port}")
+    click.echo("📋 Endpoints:")
+    click.echo("  POST /rewrite - Rewrite a prompt")
+    click.echo("  GET  /health  - Health check")
+    click.echo("\n📝 Example request:")
+    click.echo(
+        '  curl -X POST http://localhost:8000/rewrite -H "Content-Type: application/json" -d \'{"prompt": "Your prompt here", "model": "qwen2.5:0.5b", "temperature": 0.3}\''
+    )
+    run_server(host=host, port=port)
 
 
 if __name__ == "__main__":
