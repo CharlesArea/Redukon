@@ -19,6 +19,26 @@
 
 ---
 
+## 📋 Table of Contents
+
+- [✨ What is Redukon?](#-what-is-redukon)
+- [🚀 Quick Start](#-quick-start)
+- [📖 CLI Usage](#-cli-usage)
+  - [redukon onboard](#redukon-onboard)
+  - [redukon rewrite](#redukon-rewrite)
+  - [redukon serve](#redukon-serve)
+- [🌐 API Usage](#-api-usage)
+  - [Non-Streaming Example](#non-streaming-example)
+  - [Streaming Example](#streaming-example)
+  - [API Parameters](#api-parameters)
+- [🐳 Docker](#-docker)
+- [⚡ Example](#-example)
+- [🔧 Options](#-options)
+- [🛠️ Requirements](#️-requirements)
+- [📝 License](#-license)
+
+---
+
 ## ✨ What is Redukon?
 
 Redukon is a **token-saving prompt rewriter** that uses local small AI models to optimize your prompts — reducing token count while keeping the core intent intact.
