@@ -165,6 +165,30 @@ API requests are logged to `log/api-YYYY-MM-DD.log`:
 
 ---
 
+## 🐳 Docker
+
+### Option 1: API Server Only (connects to Ollama on host)
+
+```bash
+# Build image
+docker build -t redukon .
+
+# Run (ensure Ollama is running on host)
+docker run -d -p 8000:8000 --network host redukon
+```
+
+### Option 2: Full Stack with docker-compose
+
+```bash
+# Start both Redukon API and Ollama
+docker-compose up -d
+
+# Stop
+docker-compose down
+```
+
+---
+
 ## ⚡ Example
 
 | Before (87 tokens) | After (42 tokens) |
