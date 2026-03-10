@@ -100,10 +100,11 @@ redukon serve
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/rewrite` | POST | Rewrite a prompt |
+| `/rewrite` | POST | Rewrite a prompt (non-streaming) |
+| `/rewrite/stream` | POST | Rewrite a prompt (streaming) |
 | `/health` | GET | Health check |
 
-### Example Request
+### Non-Streaming Example
 
 ```bash
 curl -X POST http://localhost:8000/rewrite \
@@ -113,6 +114,21 @@ curl -X POST http://localhost:8000/rewrite \
     "model": "qwen2.5:0.5b",
     "temperature": 0.3
   }'
+```
+
+### Streaming Example
+
+```bash
+curl -X POST http://localhost:8000/rewrite/stream \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Your prompt here"}'
+```
+
+**Response (SSE format):**
+```
+data: {"chunk": "Write a "}
+data: {"chunk": "Python function..."}
+data: {"done": true, "original_tokens": 87, "optimized_tokens": 42, "saved_tokens": 45, "saved_percent": 52}
 ```
 
 ### Example Response
