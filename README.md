@@ -1,4 +1,4 @@
-# 🔥 Redukon
+# Redukon
 
 ### Reduce Your Tokens. Keep Your Intent.
 
@@ -19,35 +19,35 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [✨ What is Redukon?](#-what-is-redukon)
-- [🚀 Quick Start](#-quick-start)
-- [📖 CLI Usage](#-cli-usage)
+- [What is Redukon?](#-what-is-redukon)
+- [Quick Start](#-quick-start)
+- [CLI Usage](#-cli-usage)
   - [redukon onboard](#redukon-onboard)
   - [redukon rewrite](#redukon-rewrite)
   - [redukon serve](#redukon-serve)
-- [🌐 API Usage](#-api-usage)
+- [API Usage](#-api-usage)
   - [Non-Streaming Example](#non-streaming-example)
   - [Streaming Example](#streaming-example)
   - [API Parameters](#api-parameters)
-- [🐳 Docker](#-docker)
-- [📦 Batch Mode](#-batch-mode)
-- [🏗️ Architecture](#-architecture)
-- [⚡ Example](#-example)
-- [🔧 Options](#-options)
-- [🛠️ Requirements](#️-requirements)
-- [📝 License](#-license)
+- [Docker](#-docker)
+- [Batch Mode](#-batch-mode)
+- [Architecture](#-architecture)
+- [Example](#-example)
+- [Options](#-options)
+- [Requirements](#️-requirements)
+- [License](#-license)
 
 ---
 
-## ✨ What is Redukon?
+## What is Redukon?
 
 Redukon is a **token-saving prompt rewriter** that uses local small AI models to optimize your prompts — reducing token count while keeping the core intent intact.
 
 **No API keys needed.** Runs entirely offline with [Ollama](https://ollama.com).
 
-💡 **Perfect for:**
+**Perfect for:**
 - Saving money on API calls
 - Fitting more context into LLM windows
 - Making prompts more efficient
@@ -55,7 +55,7 @@ Redukon is a **token-saving prompt rewriter** that uses local small AI models to
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Install from PyPI
@@ -70,7 +70,7 @@ redukon onboard
 
 ---
 
-## 📖 CLI Usage
+## CLI Usage
 
 ### `redukon onboard`
 Interactive setup wizard:
@@ -111,7 +111,7 @@ redukon serve --host 127.0.0.1 --port 8080
 
 ---
 
-## 🌐 API Usage
+## API Usage
 
 ### Start Server
 ```bash
@@ -175,7 +175,7 @@ data: {"done": true, "original_tokens": 87, "optimized_tokens": 42, "saved_token
 
 ---
 
-## 📝 Logging
+## Logging
 
 API requests are logged to `log/api-YYYY-MM-DD.log`:
 
@@ -187,7 +187,7 @@ API requests are logged to `log/api-YYYY-MM-DD.log`:
 
 ---
 
-## 🐳 Docker
+## Docker
 
 ### Option 1: API Server Only (connects to Ollama on host)
 
@@ -211,7 +211,7 @@ docker-compose down
 
 ---
 
-## 📦 Batch Mode
+## Batch Mode
 
 Process multiple prompts at once!
 
@@ -264,7 +264,7 @@ curl -X POST http://localhost:8000/batch \
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -323,17 +323,17 @@ curl -X POST http://localhost:8000/batch \
 
 ---
 
-## ⚡ Example
+## Example
 
 | Before (87 tokens) | After (42 tokens) |
 |--------------------|-------------------|
 | "Please write a comprehensive Python function that takes a list of integers as input and returns a new list containing only the even numbers from the original list. The function should handle edge cases like empty lists, lists with no even numbers, and lists with negative numbers. Please include proper type hints, docstrings, and error handling." | "Write a Python function that filters even numbers from a list. Include type hints, error handling, and docstrings." |
 
-📉 **Savings: ~52%** 
+**Savings: ~52%** 
 
 ---
 
-## 🔧 Options
+## Options
 
 | Flag | Description | Default |
 |------|-------------|---------|
@@ -344,14 +344,14 @@ curl -X POST http://localhost:8000/batch \
 
 ---
 
-## 🛠️ Requirements
+## Requirements
 
 - Python 3.10+
 - [Ollama](https://ollama.com) (installed automatically during onboard)
 
 ---
 
-## 📝 License
+## License
 
 MIT © 2026 CharlesArea
 
@@ -359,7 +359,7 @@ MIT © 2026 CharlesArea
 
 <div align="center">
 
-**Made with ❤️ for the AI community**
+**Made with for the AI community**
 
 [GitHub](https://github.com/CharlesArea/Redukon) • [PyPI](https://pypi.org/project/redukon/) • [Report Bug](https://github.com/CharlesArea/Redukon/issues)
 
