@@ -4,10 +4,10 @@
 
 <p align="center">
   <a href="https://pypi.org/project/redukon/">
-    <img src="https://img.shields.io/pypi/v/redukon.svg?color=%23ff6b6b" alt="PyPI">
+    <img src="https://img.shields.io/pypi/v/redukon?color=%23ff6b6b" alt="PyPI">
   </a>
   <a href="https://pypi.org/project/redukon/">
-    <img src="https://img.shields.io/pypi/pyversions/redukon.svg?color=%23ff6b6b" alt="Python">
+    <img src="https://img.shields.io/pypi/pyversions/redukon?color=%23ff6b6b" alt="Python">
   </a>
   <a href="https://github.com/CharlesArea/Redukon/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/CharlesArea/Redukon?color=%23ff6b6b" alt="License">
