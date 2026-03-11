@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "redukon"
-version = "3.4.1"
+version = "3.5.0"
 description = "Simple CLI tool for AI text rewriting with Ollama"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -19,3 +19,6 @@ redukon = "redukon.cli:main"
 
 [tool.setup.packages.find]
 where = ["src"]
+
+[tool.setup.package-data]
+redukon = ["docs/*.svg"]
