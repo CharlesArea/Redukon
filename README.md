@@ -33,6 +33,7 @@
   - [API Parameters](#api-parameters)
 - [🐳 Docker](#-docker)
 - [📦 Batch Mode](#-batch-mode)
+- [🏗️ Architecture](#-architecture)
 - [⚡ Example](#-example)
 - [🔧 Options](#-options)
 - [🛠️ Requirements](#️-requirements)
@@ -260,6 +261,65 @@ curl -X POST http://localhost:8000/batch \
   }
 }
 ```
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        Redukon                              │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐   │
+│  │   CLI       │    │   API       │    │   Batch     │   │
+│  │  Commands   │    │  Server     │    │   Mode      │   │
+│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘   │
+│         │                   │                   │           │
+│         └───────────────────┼───────────────────┘           │
+│                             │                               │
+│                    ┌────────▼────────┐                     │
+│                    │   Ollama API     │                     │
+│                    │  (local models)  │                     │
+│                    └────────┬────────┘                     │
+│                             │                               │
+│                    ┌────────▼────────┐                     │
+│                    │  Qwen/Llama/Phi │                     │
+│                    │   0.5b - 4b     │                     │
+│                    └─────────────────┘                     │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                  Logging                            │    │
+│  │            log/api-YYYY-MM-DD.log                  │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                  Config                             │    │
+│  │            ~/.redukon/config.json                   │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Components
+
+| Component | Description |
+|-----------|-------------|
+| **CLI** | Command-line interface for single prompt rewriting |
+| **API Server** | Flask server with REST endpoints |
+| **Batch Mode** | Process multiple prompts at once |
+| **Ollama** | Local LLM runtime (connects to Ollama) |
+| **Models** | Small models (qwen2.5:0.5b, llama3.2:1b, phi3:3.8b) |
+| **Logger** | Date-based logging to `log/` directory |
+| **Config** | User settings in `~/.redukon/config.json` |
+
+### Data Flow
+
+1. **User Input** → CLI / API / Batch
+2. **System Prompt** → Loaded from config or default
+3. **Ollama API** → Sends prompt to local model
+4. **Model Processing** → Optimizes prompt (removes filler, shortens)
+5. **Response** → Returns optimized prompt + token stats
+6. **Logging** → Records request/response to log file
 
 ---
 
